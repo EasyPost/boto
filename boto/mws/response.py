@@ -785,3 +785,53 @@ class RefundResult(ResponseElement):
 
 class GetRefundDetails(RefundResult):
     pass
+
+
+class ShipmentRequestDetails(Element):
+    PackageDimensions = Element()
+    Weight = Element()
+    ShipFromAddress = Element()
+    ShippingServiceOptions = Element()
+    ItemList = Element(Item=Element())
+
+
+class LabelFormat(ResponseElement):
+    pass
+
+
+class AvailableLabelFormats(ResponseElement):
+    LabelFormat = ElementList(LabelFormat)
+
+
+class ShippingService(ResponseElement):
+    ShippingServiceOptions = Element()
+    Rate = Element()
+    AvailableLabelFormats = Element(AvailableLabelFormats)
+
+
+class Shipment(ResponseElement):
+    ItemList = ElementList(Item=Element())
+    ShipFromAddress = Element()
+    ShipToAddress = Element()
+    PackageDimensions = Element()
+    Weight = Element(ComplexWeight)
+    ShippingService = Element()
+    Label=Element(
+        FileContents=Element()
+    )
+
+
+class GetEligibleShippingServicesResult(ResponseElement):
+    ShippingServiceList = Element(
+        ShippingService=ElementList(
+            ShippingService
+        )
+    )
+
+
+class GetShipmentResult(ResponseElement):
+    Shipment = Element(Shipment)
+
+
+class CreateShipmentResult(ResponseElement):
+    Shipment = Element(Shipment)
