@@ -32,27 +32,29 @@ from boto.compat import filter, map, six, encodebytes
 __all__ = ['MWSConnection']
 
 api_version_path = {
-    'Feeds':             ('2009-01-01', 'Merchant', '/'),
-    'Reports':           ('2009-01-01', 'Merchant', '/'),
-    'Orders':            ('2013-09-01', 'SellerId', '/Orders/2013-09-01'),
-    'Products':          ('2011-10-01', 'SellerId', '/Products/2011-10-01'),
-    'Sellers':           ('2011-07-01', 'SellerId', '/Sellers/2011-07-01'),
-    'Inbound':           ('2010-10-01', 'SellerId',
-                          '/FulfillmentInboundShipment/2010-10-01'),
-    'Outbound':          ('2010-10-01', 'SellerId',
-                          '/FulfillmentOutboundShipment/2010-10-01'),
-    'Inventory':         ('2010-10-01', 'SellerId',
-                          '/FulfillmentInventory/2010-10-01'),
-    'Recommendations':   ('2013-04-01', 'SellerId',
-                          '/Recommendations/2013-04-01'),
-    'CustomerInfo':      ('2014-03-01', 'SellerId',
-                          '/CustomerInformation/2014-03-01'),
-    'CartInfo':          ('2014-03-01', 'SellerId',
-                          '/CartInformation/2014-03-01'),
-    'Subscriptions':     ('2013-07-01', 'SellerId',
-                          '/Subscriptions/2013-07-01'),
-    'OffAmazonPayments': ('2013-01-01', 'SellerId',
-                          '/OffAmazonPayments/2013-01-01'),
+    'Feeds':               ('2009-01-01', 'Merchant', '/'),
+    'Reports':             ('2009-01-01', 'Merchant', '/'),
+    'Orders':              ('2013-09-01', 'SellerId', '/Orders/2013-09-01'),
+    'Products':            ('2011-10-01', 'SellerId', '/Products/2011-10-01'),
+    'Sellers':             ('2011-07-01', 'SellerId', '/Sellers/2011-07-01'),
+    'Inbound':             ('2010-10-01', 'SellerId',
+                            '/FulfillmentInboundShipment/2010-10-01'),
+    'Outbound':            ('2010-10-01', 'SellerId',
+                            '/FulfillmentOutboundShipment/2010-10-01'),
+    'MerchantFulfillment': ('2015-06-01', 'SellerId',
+                            '/MerchantFulfillment/2015-06-01'),
+    'Inventory':           ('2010-10-01', 'SellerId',
+                            '/FulfillmentInventory/2010-10-01'),
+    'Recommendations':     ('2013-04-01', 'SellerId',
+                            '/Recommendations/2013-04-01'),
+    'CustomerInfo':        ('2014-03-01', 'SellerId',
+                            '/CustomerInformation/2014-03-01'),
+    'CartInfo':            ('2014-03-01', 'SellerId',
+                            '/CartInformation/2014-03-01'),
+    'Subscriptions':       ('2013-07-01', 'SellerId',
+                            '/Subscriptions/2013-07-01'),
+    'OffAmazonPayments':   ('2013-01-01', 'SellerId',
+                            '/OffAmazonPayments/2013-01-01'),
 }
 content_md5 = lambda c: encodebytes(hashlib.md5(c).digest()).strip()
 decorated_attrs = ('action', 'response', 'section',
@@ -1164,5 +1166,37 @@ class MWSConnection(AWSQueryConnection):
     def get_offamazonpayments_service_status(self, request, response, **kw):
         """Returns the operational status of the Off-Amazon Payments API
            section.
+        """
+        return self._post_request(request, kw, response)
+
+    @requires(['ShipmentRequestDetails'])
+    @structured_objects('ShipmentRequestDetails')
+    @api_action('MerchantFulfillment', 10, 1, 'GetEligibleShippingServices')
+    def get_eligible_shipping_services(self, request, response, **kw):
+        """Returns a list of shipping service offers that satisfy the shipment
+           request details that you specify.
+        """
+        return self._post_request(request, kw, response)
+
+    @requires(['ShipmentRequestDetails', 'ShippingServiceId'])
+    @structured_objects('ShipmentRequestDetails')
+    @api_action('MerchantFulfillment', 10, 1, 'CreateShipment')
+    def create_shipment(self, request, response, **kw):
+        """Purchases shipping and returns PDF, PNG, or ZPL document data for a
+           shipping label, depending on the carrier.
+        """
+        return self._post_request(request, kw, response)
+
+    @requires(['ShipmentId'])
+    @api_action('MerchantFulfillment', 10, 1, 'GetShipment')
+    def get_shipment(self, request, response, **kw):
+        """Returns an existing shipment based on criteria that you specify.
+        """
+        return self._post_request(request, kw, response)
+
+    @api_action('MerchantFulfillment', 2, 300, 'GetServiceStatus')
+    def get_fulfillment_service_status(self, request, response, **kw):
+        """Returns the operational status of the Merchant Fulfillment API
+        section.
         """
         return self._post_request(request, kw, response)
